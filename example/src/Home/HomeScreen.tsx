@@ -32,6 +32,7 @@ export const HomeScreen: React.FC = () => {
         description="Use touches to draw with Skia"
         route="Drawing"
       />
+      <HomeScreenButton title="Demo" description="Demo" route="Demo" />
     </View>
   );
 };
