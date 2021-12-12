@@ -33,6 +33,11 @@ export const HomeScreen: React.FC = () => {
         route="Drawing"
       />
       <HomeScreenButton title="Demo" description="Demo" route="Demo" />
+      <HomeScreenButton
+        title="Animation"
+        description="Animated with Skia"
+        route="Animation"
+      />
     </View>
   );
 };
