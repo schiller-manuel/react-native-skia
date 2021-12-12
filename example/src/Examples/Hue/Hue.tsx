@@ -10,10 +10,17 @@ import {
   useValue,
   useTouchHandler,
   BlurMask,
+  canvas2Polar,
+  polar2Canvas,
+  color,
+  TAU,
+  normalizeRad,
 } from "@shopify/react-native-skia";
 import { Dimensions } from "react-native";
 
 import { Shader } from "../../../../package/src/renderer/components/shaders/Shader";
+
+import { polar2Color } from "./Color";
 
 const { width, height } = Dimensions.get("window");
 const c = vec(width / 2, height / 2);
@@ -39,12 +46,23 @@ half4 main(vec2 uv) {
 
 export const Hue = () => {
   const r = (width - 32) / 2;
+  const cl = useValue(color(255, 255, 255, 1));
   const translateX = useValue(c.x);
   const translateY = useValue(c.y);
+  const isLight = useValue(false);
   const onTouch = useTouchHandler({
-    onActive: ({ x, y }) => {
+    onActive: (p) => {
+      const { theta, radius } = canvas2Polar(p, c);
+      const { x, y } = polar2Canvas({ theta, radius: Math.min(radius, r) }, c);
       translateX.value = x;
       translateY.value = y;
+      console.log({
+        theta: theta / TAU,
+        radius: Math.min(radius, r) / r,
+      });
+      const rgb = polar2Color(normalizeRad(theta), Math.min(radius, r), r);
+      cl.value = rgb.color;
+      isLight.value = rgb.light;
     },
   });
   return (
@@ -57,10 +75,16 @@ export const Hue = () => {
       <Circle c={c} r={r} />
       <Circle
         r={20}
-        color="red"
+        color={() => cl.value}
         cx={() => translateX.value}
         cy={() => translateY.value}
-      />
+      >
+        <Paint
+          style="stroke"
+          strokeWidth={4}
+          color={() => (isLight.value ? "black" : "white")}
+        />
+      </Circle>
     </Canvas>
   );
 };

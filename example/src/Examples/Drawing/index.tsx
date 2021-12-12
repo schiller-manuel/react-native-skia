@@ -1,7 +1,8 @@
 import React, { useMemo, useRef } from "react";
-import { Button, StyleSheet, View } from "react-native";
+import { Button, StyleSheet, View, Dimensions } from "react-native";
 import type { IPath } from "@shopify/react-native-skia";
 import {
+  useImage,
   Skia,
   usePaint,
   useDrawCallback,
@@ -10,11 +11,15 @@ import {
   StrokeCap,
   SkiaView,
 } from "@shopify/react-native-skia";
+import { fitRects } from "@shopify/react-native-skia/src/renderer/components/image/BoxFit";
 
 type Point = { x: number; y: number };
 
+const { width, height } = Dimensions.get("window");
+const paint = Skia.Paint();
+
 export const DrawingExample: React.FC = () => {
-  const paint = usePaint((p) => p.setColor(Skia.Color("#7FC8A9")));
+  const oslo = useImage(require("../../assets/oslo.jpg"));
   const prevPointRef = useRef<Point>();
 
   const pathPaint = usePaint((p) => {
@@ -53,7 +58,10 @@ export const DrawingExample: React.FC = () => {
       touchHandler(info.touches);
 
       // Clear screen
-      canvas.drawPaint(paint);
+      if (oslo) {
+        const rects = fitRects("cover", oslo, { x: 0, y: 0, width, height });
+        canvas.drawImageRect(oslo, rects.src, rects.dst, paint);
+      }
 
       // Draw paths
       if (paths.length > 0) {
@@ -62,7 +70,7 @@ export const DrawingExample: React.FC = () => {
         }
       }
     },
-    [paint, pathPaint, paths]
+    [pathPaint, paths]
   );
 
   const skiaViewRef = useRef<SkiaView>(null);
