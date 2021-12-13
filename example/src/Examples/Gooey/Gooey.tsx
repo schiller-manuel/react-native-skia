@@ -28,6 +28,7 @@ import { BG, FG } from "./components/Theme";
 
 const { width, height } = Dimensions.get("window");
 const c = vec(width / 2, height / 2 - 64);
+const progress = 1;
 
 const p1 = Skia.Path.MakeFromSVGString(
   "M 22.54 6.42 A 2.78 2.78 0 0 0 20.6 4.42 C 18.88 4 12 4 12 4 C 12 4 5.12 4 3.4 4.46 A 2.78 2.78 0 0 0 1.46 6.46 A 29 29 0 0 0 1 11.75 A 29 29 0 0 0 1.46 17.08 A 2.78 2.78 0 0 0 3.4 19 C 5.12 19.46 12 19.46 12 19.46 C 12 19.46 18.88 19.46 20.6 19 A 2.78 2.78 0 0 0 22.54 17 A 29 29 0 0 0 23 11.75 A 29 29 0 0 0 22.54 6.42 Z"
@@ -57,29 +58,12 @@ const icons = [
 ];
 
 export const Gooey = () => {
-  const paint = usePaintRef();
-  const [toggled, setToggled] = useState(false);
-  const onTouch = useTouchHandler({ onEnd: () => setToggled(!toggled) });
-  const progress = useSpring(toggled ? 1 : 0, Spring.Config.Gentle);
   return (
-    <Canvas style={{ flex: 1 }} onTouch={onTouch}>
-      <Defs>
-        <Paint ref={paint}>
-          <ColorMatrix
-            value={[
-              1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 18, -7,
-            ]}
-          />
-          <Blur sigmaX={20} sigmaY={20} />
-        </Paint>
-      </Defs>
+    <Canvas style={{ flex: 1 }}>
       <Fill color={BG} />
-      <Group rasterize={paint}>
+      <Group>
         {icons.map(({ dst }, i) => (
-          <Group
-            key={i}
-            transform={() => translate(mixVector(progress.value, c, dst))}
-          >
+          <Group key={i} transform={translate(mixVector(progress, c, dst))}>
             <Circle r={R} color={FG} />
           </Group>
         ))}
@@ -88,10 +72,7 @@ export const Gooey = () => {
         </Group>
       </Group>
       {icons.map(({ path, dst }, i) => (
-        <Group
-          key={i}
-          transform={() => translate(mixVector(progress.value, c, dst))}
-        >
+        <Group key={i} transform={translate(mixVector(progress, c, dst))}>
           <Icon path={path} />
         </Group>
       ))}
