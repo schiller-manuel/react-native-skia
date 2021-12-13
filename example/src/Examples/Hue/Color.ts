@@ -1,7 +1,7 @@
 import {
   mix,
   clamp,
-  color,
+  rgbaColor,
   normalizeRad,
   TAU,
 } from "@shopify/react-native-skia";
@@ -47,7 +47,7 @@ export const polar2Color = (
   const s = quadraticIn(radius / maxRadius);
   console.log({ h2: h, s2: s });
   const { r, g, b } = hsv2rgb(h, s, v);
-  const cl = color(r, g, b, 1);
+  const cl = rgbaColor(r, g, b, 1);
   const light = isLight(r, g, b);
   return { color: cl, light };
 };
